@@ -90,7 +90,7 @@ func TestCounter_CollectWord(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "test 8 (camel case word)",
+			name: "test 9 (camel case word)",
 			fields: fields{
 				inputStreamer: wordcount.MakeFastReader("EXPECT one word"),
 				words:         map[string]int{"one": 1, "expect": 1, "word": 1},
@@ -98,7 +98,7 @@ func TestCounter_CollectWord(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "test 9 (has punctuation)",
+			name: "test 10 (has punctuation)",
 			fields: fields{
 				inputStreamer: wordcount.MakeFastReader("EXPECT one word!!!"),
 				words:         map[string]int{"one": 1, "expect": 1, "word": 1},
@@ -106,7 +106,7 @@ func TestCounter_CollectWord(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "test 10 (has punctuation in different places)",
+			name: "test 11 (has punctuation in different places)",
 			fields: fields{
 				inputStreamer: wordcount.MakeFastReader("I like, this... word EXPECT one word!!!"),
 				words:         map[string]int{"expect": 1, "i": 1, "like": 1, "one": 1, "this": 1, "word": 2},
@@ -114,7 +114,7 @@ func TestCounter_CollectWord(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "test 11 (just punctuation and numbers)",
+			name: "test 12 (just punctuation and numbers)",
 			fields: fields{
 				inputStreamer: wordcount.MakeFastReader(".,?!123123%&"),
 				words:         map[string]int{},
