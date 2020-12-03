@@ -73,6 +73,54 @@ func TestCounter_CollectWord(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "test 7 (all letters in camel case word)",
+			fields: fields{
+				inputStreamer: wordcount.MakeFastReader("WORD another word"),
+				words:         map[string]int{"word": 2, "another": 1},
+			},
+			wantErr: false,
+		},
+		{
+			name: "test 8 (camel case word)",
+			fields: fields{
+				inputStreamer: wordcount.MakeFastReader("EXPECT one word"),
+				words:         map[string]int{"one": 1, "expect": 1, "word": 1},
+			},
+			wantErr: false,
+		},
+		{
+			name: "test 8 (camel case word)",
+			fields: fields{
+				inputStreamer: wordcount.MakeFastReader("EXPECT one word"),
+				words:         map[string]int{"one": 1, "expect": 1, "word": 1},
+			},
+			wantErr: false,
+		},
+		{
+			name: "test 9 (has punctuation)",
+			fields: fields{
+				inputStreamer: wordcount.MakeFastReader("EXPECT one word!!!"),
+				words:         map[string]int{"one": 1, "expect": 1, "word": 1},
+			},
+			wantErr: false,
+		},
+		{
+			name: "test 10 (has punctuation in different places)",
+			fields: fields{
+				inputStreamer: wordcount.MakeFastReader("I like, this... word EXPECT one word!!!"),
+				words:         map[string]int{"expect": 1, "i": 1, "like": 1, "one": 1, "this": 1, "word": 2},
+			},
+			wantErr: false,
+		},
+		{
+			name: "test 11 (just punctuation and numbers)",
+			fields: fields{
+				inputStreamer: wordcount.MakeFastReader(".,?!123123%&"),
+				words:         map[string]int{},
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
