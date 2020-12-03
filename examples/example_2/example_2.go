@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/dmitryk-dk/unique-words/counter"
-	word_rank "github.com/dmitryk-dk/unique-words/word-rank"
+	wordRank "github.com/dmitryk-dk/unique-words/word-rank"
 	"github.com/dmitryk-dk/unique-words/wordcount"
 )
 
@@ -37,7 +37,10 @@ func main() {
 	}()
 	go func() {
 		for data := range wordsCountC {
-			fmt.Printf("Refreshed data: %s\n", word_rank.RankWords(data))
+			rankings := wordRank.RankWords(data)
+			for _, ranking := range rankings {
+				fmt.Printf("Refreshed data: %s\n", ranking)
+			}
 		}
 	}()
 	wg.Wait()
@@ -50,4 +53,3 @@ func collectCounts(counters []*counter.Counter) map[string]int {
 	}
 	return nil
 }
-

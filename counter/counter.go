@@ -35,6 +35,9 @@ func New(stream wordcount.InputStream) *Counter {
 
 func (c *Counter) readWord() {
 	for word := range c.wordC {
+		if word == "" {
+			continue
+		}
 		if _, ok := c.words[word]; ok {
 			c.words[word] += 1
 		} else {
@@ -67,6 +70,7 @@ func (c *Counter) CollectWord() error {
 			}
 		} else {
 			if err == io.EOF {
+				c.wordC <- string(runes)
 				return nil
 			}
 			return err
