@@ -41,6 +41,7 @@ func main() {
 			for _, ranking := range rankings {
 				fmt.Printf("Refreshed data: %s\n", ranking)
 			}
+			fmt.Println("================================")
 		}
 	}()
 	wg.Wait()
