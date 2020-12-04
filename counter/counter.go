@@ -2,18 +2,10 @@ package counter
 
 import (
 	"io"
-	"strings"
 	"sync"
 	"unicode"
 
 	"github.com/dmitryk-dk/unique-words/wordcount"
-)
-
-const Alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-var (
-	newline = '\n'
-	space   = ' '
 )
 
 type Counter struct {
@@ -44,6 +36,7 @@ func (c *Counter) readWord() {
 			c.words[word] = 1
 		}
 	}
+	close(c.wordC)
 }
 
 func (c *Counter) WordCounts() map[string]int {
@@ -57,23 +50,21 @@ func (c *Counter) WordCounts() map[string]int {
 }
 
 func (c *Counter) CollectWord() error {
-	runes := make([]rune, 0)
+	runes := make([]rune, 0, 100)
 	for {
-		if r, err := c.inputStreamer.TakeChar(); err == nil {
-			if r == space || r == newline {
-				c.wordC <- string(runes)
-				runes = nil
-				continue
-			}
-			if strings.Index(Alphabet, string(r)) > -1 {
-				runes = append(runes, unicode.ToLower(r))
-			}
-		} else {
+		r, err := c.inputStreamer.TakeChar()
+		if err != nil {
 			if err == io.EOF {
 				c.wordC <- string(runes)
 				return nil
 			}
 			return err
+		}
+		if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') {
+			runes = append(runes, unicode.ToLower(r))
+		} else {
+			c.wordC <- string(runes)
+			runes = runes[0:0]
 		}
 	}
 }
