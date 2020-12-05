@@ -27,16 +27,14 @@ func New(stream wordcount.InputStream) *Counter {
 
 func (c *Counter) readWord() {
 	for word := range c.wordC {
-		if word == "" {
-			continue
-		}
+		c.mx.Lock()
 		if _, ok := c.words[word]; ok {
 			c.words[word] += 1
 		} else {
 			c.words[word] = 1
 		}
+		c.mx.Unlock()
 	}
-	close(c.wordC)
 }
 
 func (c *Counter) WordCounts() map[string]int {
@@ -49,22 +47,29 @@ func (c *Counter) WordCounts() map[string]int {
 	return wordCounts
 }
 
-func (c *Counter) CollectWord() error {
+func (c *Counter) CollectWord() (err error) {
 	runes := make([]rune, 0, 100)
+	var r rune
 	for {
-		r, err := c.inputStreamer.TakeChar()
+		r, err = c.inputStreamer.TakeChar()
 		if err != nil {
 			if err == io.EOF {
-				c.wordC <- string(runes)
-				return nil
+				err = nil
 			}
-			return err
+			break
 		}
 		if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') {
 			runes = append(runes, unicode.ToLower(r))
-		} else {
+			continue
+		}
+		if len(runes) > 0 {
 			c.wordC <- string(runes)
 			runes = runes[0:0]
 		}
 	}
+	if len(runes) > 0 {
+		c.wordC <- string(runes)
+	}
+	close(c.wordC)
+	return
 }

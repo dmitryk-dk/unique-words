@@ -128,7 +128,7 @@ func TestCounter_CollectWord(t *testing.T) {
 			if err := c.CollectWord(); (err != nil) != tt.wantErr {
 				t.Errorf("CollectWord() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			assert.Equal(t, tt.fields.words, c.words)
+			assert.Equal(t, tt.fields.words, c.WordCounts())
 		})
 	}
 }
