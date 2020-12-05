@@ -50,10 +50,6 @@ func (c *Counter) WordCounts() map[string]int {
 func (c *Counter) CollectWord() (err error) {
 	runes := make([]rune, 0, 100)
 	var r rune
-	defer func() {
-		c.inputStreamer.Dispose()
-		close(c.wordC)
-	}()
 	for {
 		r, err = c.inputStreamer.TakeChar()
 		if err != nil {
@@ -74,5 +70,7 @@ func (c *Counter) CollectWord() (err error) {
 	if len(runes) > 0 {
 		c.wordC <- string(runes)
 	}
+	c.inputStreamer.Dispose()
+	close(c.wordC)
 	return
 }
