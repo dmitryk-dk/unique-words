@@ -132,3 +132,43 @@ func TestCounter_CollectWord(t *testing.T) {
 		})
 	}
 }
+
+// Test result
+// BenchmarkCounter_CollectWord-8                           1439419               804 ns/op             240 B/op          4 allocs/op
+func BenchmarkCounter_CollectWord(b *testing.B) {
+	inputStreamer := wordcount.MakeFastReader(wordcount.ExampleText)
+	for n := 0; n < b.N; n++ {
+		c := New(inputStreamer)
+		if err := c.CollectWord(); err != nil {
+			b.Errorf("CollectWord() error = %v", err)
+		}
+		c.WordCounts()
+	}
+
+}
+
+// Test result
+// BenchmarkCounter_CollectWordWithBuilder-8                1499203               797 ns/op             240 B/op          4 allocs/op
+func BenchmarkCounter_CollectWordWithBuilder(b *testing.B) {
+	inputStreamer := wordcount.MakeFastReader(wordcount.ExampleText)
+	for n := 0; n < b.N; n++ {
+		c := New(inputStreamer)
+		if err := c.CollectWordWithBuilder(); err != nil {
+			b.Errorf("CollectWordWithBuilder() error = %v", err)
+		}
+		c.WordCounts()
+	}
+}
+
+// Test result
+// BenchmarkCounter_CollectWordWithoutCapacity-8            1493581               803 ns/op             240 B/op          4 allocs/op
+func BenchmarkCounter_CollectWordWithoutCapacity(b *testing.B) {
+	inputStreamer := wordcount.MakeFastReader(wordcount.ExampleText)
+	for n := 0; n < b.N; n++ {
+		c := New(inputStreamer)
+		if err := c.CollectWordWithoutCapacity(); err != nil {
+			b.Errorf("CollectWordWithBuilder() error = %v", err)
+		}
+		c.WordCounts()
+	}
+}

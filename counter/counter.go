@@ -2,6 +2,7 @@ package counter
 
 import (
 	"io"
+	"strings"
 	"sync"
 	"unicode"
 
@@ -65,6 +66,62 @@ func (c *Counter) CollectWord() (err error) {
 		if len(runes) > 0 {
 			c.wordC <- string(runes)
 			runes = runes[0:0]
+		}
+	}
+	if len(runes) > 0 {
+		c.wordC <- string(runes)
+	}
+	c.inputStreamer.Dispose()
+	close(c.wordC)
+	return
+}
+
+func (c *Counter) CollectWordWithBuilder() (err error) {
+	var runes strings.Builder
+	var r rune
+	for {
+		r, err = c.inputStreamer.TakeChar()
+		if err != nil {
+			if err == io.EOF {
+				err = nil
+			}
+			break
+		}
+		if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') {
+			runes.WriteRune(unicode.ToLower(r))
+			continue
+		}
+		if runes.Len() > 0 {
+			c.wordC <- runes.String()
+			runes.Reset()
+		}
+	}
+	if runes.Len() > 0 {
+		c.wordC <- runes.String()
+	}
+	c.inputStreamer.Dispose()
+	close(c.wordC)
+	return
+}
+
+func (c *Counter) CollectWordWithoutCapacity() (err error) {
+	runes := make([]rune, 0)
+	var r rune
+	for {
+		r, err = c.inputStreamer.TakeChar()
+		if err != nil {
+			if err == io.EOF {
+				err = nil
+			}
+			break
+		}
+		if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') {
+			runes = append(runes, unicode.ToLower(r))
+			continue
+		}
+		if len(runes) > 0 {
+			c.wordC <- string(runes)
+			runes = nil
 		}
 	}
 	if len(runes) > 0 {
